@@ -9,6 +9,8 @@ use Lim::Agent ();
 
 use base qw(Lim::Component::CLI);
 
+=encoding utf8
+
 =head1 NAME
 
 ...
@@ -63,9 +65,9 @@ sub plugins {
 		my ($call, $response) = @_;
 		
 		if ($call->Successful) {
-		    $self->cli->println(join("\t", qw(Name Module Version)));
+		    $self->cli->println(join("\t", qw(Name Description Module Version)));
 		    foreach my $plugin (@{$response->{plugin}}) {
-		        $self->cli->println(join("\t", $plugin->{name}, $plugin->{module}, $plugin->{version}));
+		        $self->cli->println(join("\t", $plugin->{name}, $plugin->{description}, $plugin->{module}, $plugin->{version}));
 		    }
 			$self->Successful;
 		}
@@ -104,7 +106,7 @@ L<https://github.com/jelu/lim/issues>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Jerry Lundström.
+Copyright 2012-2013 Jerry Lundström.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

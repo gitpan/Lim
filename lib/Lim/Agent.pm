@@ -6,6 +6,8 @@ use Lim ();
 
 use base qw(Lim::Component);
 
+=encoding utf8
+
 =head1 NAME
 
 ...
@@ -32,6 +34,14 @@ sub Module {
     'Agent';
 }
 
+=head2 function1
+
+=cut
+
+sub Description {
+    'This is the core module of the Lim Agent Daemon, it manage other modules and provides system information.';
+}
+
 =head2 function2
 
 =cut
@@ -47,8 +57,62 @@ sub Calls {
             out => {
                 plugin => {
                     name => 'string',
+                    description => 'string optional',
                     module => 'string',
                     version => 'string',
+                    loaded => 'bool'
+                }
+            }
+        },
+        ReadPlugin => {
+            uri_map => [
+                'plugin.name=\w+',
+                'plugin.name=\w+/version => ReadPluginVersion',
+                'plugin.name=\w+/loaded => ReadPluginLoaded'
+            ],
+            in => {
+                plugin => {
+                    name => 'string'
+                }
+            },
+            out => {
+                plugin => {
+                    name => 'string',
+                    description => 'string optional',
+                    module => 'string',
+                    version => 'string',
+                    loaded => 'bool'
+                }
+            }
+        },
+        ReadPluginVersion => {
+            uri_map => [
+                'plugin.name=\w+'
+            ],
+            in => {
+                plugin => {
+                    name => 'string'
+                }
+            },
+            out => {
+                plugin => {
+                    name => 'string',
+                    version => 'string'
+                }
+            }
+        },
+        ReadPluginLoaded => {
+            uri_map => [
+                'plugin.name=\w+'
+            ],
+            in => {
+                plugin => {
+                    name => 'string'
+                }
+            },
+            out => {
+                plugin => {
+                    name => 'string',
                     loaded => 'bool'
                 }
             }
@@ -95,7 +159,7 @@ L<https://github.com/jelu/lim/issues>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Jerry Lundström.
+Copyright 2012-2013 Jerry Lundström.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

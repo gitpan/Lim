@@ -1,4 +1,4 @@
-package Lim::RPC::Client::TLS;
+package Lim::RPC::TLS;
 
 use common::sense;
 use Carp;
@@ -6,8 +6,11 @@ use Carp;
 use Log::Log4perl ();
 
 use AnyEvent::TLS ();
+use Net::SSLeay ();
 
 use Lim ();
+
+=encoding utf8
 
 =head1 NAME
 
@@ -35,24 +38,26 @@ our $INSTANCE;
 sub new {
     my $this = shift;
     my $class = ref($this) || $this;
-    my %args = ( @_ );
     my $self = {
         logger => Log::Log4perl->get_logger,
     };
     bless $self, $class;
     
-    unless (defined $args{key} and -f $args{key}) {
-        confess __PACKAGE__, ': No key file specified or not found';
+    eval {
+        if (!defined Lim::Config->{rpc}->{tls}->{key_file}) {
+            $@ = 'No key_file set';
+        }
+        elsif (!defined Lim::Config->{rpc}->{tls}->{cert_file}) {
+            $@ = 'No cert_file set';
+        }
+        else {
+            $self->{tls_ctx} = AnyEvent::TLS->new(%{Lim::Config->{rpc}->{tls}});
+        }
+    };
+    if ($@) {
+        Lim::OBJ_DEBUG and $self->{logger}->debug('Unable to initialize TLS context, will not use TLS/SSL: ', $@);
+        $self->{tls_ctx} = undef;
     }
-
-    $self->{tls_ctx} = AnyEvent::TLS->new(
-        method => 'any',
-        ca_file => $args{key},
-        cert_file => $args{key},
-        key_file => $args{key},
-        verify => 1,
-        verify_require_client_cert => 1
-        );
 
     Lim::OBJ_DEBUG and $self->{logger}->debug('new ', __PACKAGE__, ' ', $self);
     $self;
@@ -72,16 +77,7 @@ END {
 =cut
 
 sub instance {
-    $INSTANCE ||= Lim::RPC::Client::TLS->new;
-}
-
-=head2 function1
-
-=cut
-
-sub set_instance {
-    shift;
-    $INSTANCE = shift;
+    $INSTANCE ||= Lim::RPC::TLS->new;
 }
 
 =head2 function1
@@ -120,7 +116,7 @@ L<https://github.com/jelu/lim/issues>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Jerry Lundström.
+Copyright 2012-2013 Jerry Lundström.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
@@ -131,4 +127,4 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-1; # End of Lim::RPC::Client::TLS
+1; # End of Lim::RPC::TLS

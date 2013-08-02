@@ -11,6 +11,8 @@ use Lim::RPC::Value ();
 use Lim::RPC::Value::Collection ();
 use Lim::RPC::Call ();
 
+=encoding utf8
+
 =head1 NAME
 
 Lim::Component - Base class for plugins
@@ -75,6 +77,16 @@ This function must be overloaded or it will L<confess>.
 
 sub Module {
     confess 'Module not overloaded';
+}
+
+=item $module_name = Lim::Plugin::MyPlugin->Description
+
+Returns module description.
+
+=cut
+
+sub Description {
+    'No description for this module';
 }
 
 =item $call_hash_ref = Lim::Plugin::MyPlugin->Calls
@@ -303,7 +315,7 @@ L<https://github.com/jelu/lim/issues>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Jerry Lundström.
+Copyright 2012-2013 Jerry Lundström.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -9,6 +9,8 @@ use Module::Find qw(findsubmod);
 
 use Lim ();
 
+=encoding utf8
+
 =head1 NAME
 
 Lim::Plugins - Lim's plugin loader and container
@@ -91,18 +93,28 @@ sub Load {
             next;
         }
 
-        my $name;
+        if ($module =~ /^([\w:]+)$/o) {
+            $module = $1;
+        }
+        else {
+            next;
+        }
+
+        my ($name, $description);
         eval {
             eval "require $module;";
             die $@ if $@;
             $name = $module->Module;
+            $description = $module->Description;
         };
         
         if ($@) {
             $self->{logger}->warn('Unable to load plugin ', $module, ': ', $@);
             $self->{plugin}->{$module} = {
                 name => $name,
+                description => $description,
                 module => $module,
+                version => -1,
                 loaded => 0,
                 error => $@
             };
@@ -111,6 +123,7 @@ sub Load {
         
         $self->{plugin}->{$module} = {
             name => $name,
+            description => $description,
             module => $module,
             version => $module->VERSION,
             loaded => 1
@@ -210,7 +223,7 @@ L<https://github.com/jelu/lim/issues>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Jerry Lundström.
+Copyright 2012-2013 Jerry Lundström.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -9,11 +9,14 @@ use Fcntl qw(:seek);
 use IO::File ();
 use Digest::SHA ();
 use Scalar::Util qw(blessed);
+use URI::Escape ();
 
 use AnyEvent ();
 use AnyEvent::Util ();
 
 use Lim ();
+
+=encoding utf8
 
 =head1 NAME
 
@@ -198,9 +201,17 @@ sub FileWriteContent {
         $tell = $fh->tell;
         $fh->seek(0, SEEK_SET);
         unless ($fh->read($read, $tell) == $tell) {
+            $fh->close;
+            unless ($file->isa('File::Temp')) {
+                unlink($filename);
+            }
             return;
         }
         unless (Digest::SHA::sha1_base64($content) eq Digest::SHA::sha1_base64($read)) {
+            $fh->close;
+            unless ($file->isa('File::Temp')) {
+                unlink($filename);
+            }
             return;
         }
     }
@@ -312,6 +323,108 @@ sub URIize {
     $uri = lc(join('_', @parts));
     
     return ($method, '/'.$uri);
+}
+
+=item $hash_ref = Lim::Util::QueryDecode($query_string)
+
+Returns an HASH reference of the decode query string.
+
+=cut
+
+sub QueryDecode {
+    my ($href, $href_final) = ({}, {});
+    
+    foreach my $part (split(/&/o, $_[0])) {
+        my ($key, $value) = split(/=/o, $part, 2);
+
+        $key = URI::Escape::uri_unescape($key);
+        $value = URI::Escape::uri_unescape($value);
+        
+        unless ($key) {
+            return;
+        }
+        
+        # check if last element is array and remove it from $key
+        my $array = $key =~ s/\[\]$//o ? 1 : 0;
+        # verify $key
+        unless ($key =~ /^[^\]]+(?:\[[^\]]+\])*$/o) {
+            return;
+        }
+        # remove last ] so we don't split or get it in $k
+        $key =~ s/\]$//o;
+
+        my @keys = split(/(?:\]\[|\[)/o, $key);
+        my $this = $href;
+        while (defined (my $k = shift(@keys))) {
+            unless (scalar @keys) {
+                if ($array and exists $this->{$k}) {
+                    unless (ref($this->{$k}) eq 'ARRAY') {
+                        return;
+                    }
+                    push(@{$this->{$k}}, $value);
+                    last;
+                }
+                $this->{$k} = $array ? [ $value ] : $value;
+                last;
+            }
+
+            if (exists $this->{$k}) {
+                $this = $this->{$k};
+                next;
+            }
+            
+            $this = $this->{$k} = {};
+        }
+    }
+
+    # restruct hashes with all numeric keys to arrays
+    my @process = ([$href, $href_final, undef, undef]);
+    while (defined (my $this = shift(@process))) {
+        my ($old, $new, $parent, $key) = @$this;
+        
+        my $numeric = 1;
+        foreach (keys %$old) {
+            unless (/^\d+$/o) {
+                $numeric = 0;
+                last;
+            }
+        }
+        
+        if ($numeric) {
+            my @array;
+            foreach (sort (keys %$old)) {
+                if (ref($old->{$_}) eq 'HASH') {
+                    my $entry = {};
+                    push(@array, $entry);
+                    push(@process, [$old->{$_}, $entry, \@array, scalar @array - 1]);
+                    next;
+                }
+                push(@array, $old->{$_});
+            }
+            
+            if (ref($parent) eq 'HASH') {
+                $parent->{$key} = \@array;
+            }
+            elsif (ref($parent) eq 'ARRAY') {
+                $parent->[$key] = \@array;
+            }
+            else {
+                return;
+            }
+        }
+        else {
+            foreach (keys %$old) {
+                if (ref($old->{$_}) eq 'HASH') {
+                    $new->{$_} = {};
+                    push(@process, [$old->{$_}, $new->{$_}, $new, $_]);
+                    next;
+                }
+                $new->{$_} = $old->{$_};
+            }
+        }
+    }
+    
+    return $href_final;
 }
 
 =item $camelized = Lim::Util::Camelize($underscore)
@@ -497,7 +610,7 @@ L<https://github.com/jelu/lim/issues>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Jerry Lundström.
+Copyright 2012-2013 Jerry Lundström.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
