@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Lim
-version:            0.14
+version:            0.15
 abstract:           Framework for RESTful JSON/XML, JSON-RPC, XML-RPC and SOAP
 author:
     - Jerry Lundström <lundstrom.jerry@gmail.com>
@@ -9,8 +9,6 @@ distribution_type:  module
 configure_requires:
     ExtUtils::MakeMaker:  0
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
     AnyEvent:             5
     common::sense:        3
     Data::Dumper:         2.124
@@ -41,6 +39,36 @@ requires:
     XMLRPC::Lite:         0.71
     XMLRPC::Transport::HTTP::Server:  0.12
     YAML::Any:            0.7
+requires:
+    AnyEvent:             5
+    common::sense:        3
+    Data::Dumper:         2.124
+    Digest::SHA:          5
+    Fcntl:                1.06
+    File::Temp:           0.2
+    Getopt::Long:         2
+    HTTP::Request:        5
+    HTTP::Response:       5
+    HTTP::Status:         5
+    IO::File:             0
+    IO::Handle:           0
+    JSON::XS:             2
+    Log::Dispatch::Syslog:  1.18
+    Log::Log4perl:        1
+    Log::Log4perl::Appender::Lim::CLI:  0.12
+    LWP::MediaTypes:      5.822
+    Module::Find:         0
+    Net::SSLeay:          1.35
+    Pod::Usage:           1
+    Scalar::Util:         1
+    SOAP::Lite:           0.71
+    SOAP::Transport::HTTP:  0.71
+    URI:                  1
+    URI::Escape:          3.29
+    URI::Split:           0
+    XMLRPC::Lite:         0.71
+    XMLRPC::Transport::HTTP::Server:  0.12
+    YAML::Any:            0.7
 resources:
     bugtracker:  http://github.com/jelu/lim/issues
     homepage:    http://github.com/jelu/lim/wiki
@@ -49,7 +77,7 @@ no_index:
     directory:
         - t
         - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+generated_by:       ExtUtils::MakeMaker version 6.57_05
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4
