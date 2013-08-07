@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Lim
-version:            0.15
+version:            0.16
 abstract:           Framework for RESTful JSON/XML, JSON-RPC, XML-RPC and SOAP
 author:
     - Jerry Lundström <lundstrom.jerry@gmail.com>
@@ -70,9 +70,9 @@ requires:
     XMLRPC::Transport::HTTP::Server:  0.12
     YAML::Any:            0.7
 resources:
-    bugtracker:  http://github.com/jelu/lim/issues
-    homepage:    http://github.com/jelu/lim/wiki
-    repository:  http://github.com/jelu/lim
+    bugtracker:  https://github.com/jelu/lim/issues
+    homepage:    https://github.com/jelu/lim/wiki
+    repository:  https://github.com/jelu/lim
 no_index:
     directory:
         - t
