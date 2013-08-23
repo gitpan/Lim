@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Lim
-version:            0.17
+version:            0.18
 abstract:           Framework for RESTful JSON/XML, JSON-RPC, XML-RPC and SOAP
 author:
     - Jerry Lundström <lundstrom.jerry@gmail.com>
