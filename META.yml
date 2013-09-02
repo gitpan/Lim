@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Lim
-version:            0.18
+version:            0.19
 abstract:           Framework for RESTful JSON/XML, JSON-RPC, XML-RPC and SOAP
 author:
     - Jerry Lundström <lundstrom.jerry@gmail.com>
@@ -43,6 +43,7 @@ requires:
     AnyEvent:             5
     common::sense:        3
     Data::Dumper:         2.124
+    DBI:                  1.612
     Digest::SHA:          5
     Fcntl:                1.06
     File::Temp:           0.2
